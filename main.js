@@ -1,2 +1,5 @@
 var srv = require("./server/tcpServer");
-srv.create(3000);
+process.argv.forEach(function (val, index) {
+	console.log(index + ': ' + val);
+});
+srv.create(process.argv[2] || 8080);
