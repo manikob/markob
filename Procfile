@@ -1,1 +1,1 @@
-web: node ./main.js process.env.PORT
+web: node ./main.js
