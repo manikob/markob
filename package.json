@@ -4,5 +4,9 @@
 	"keywords": ["util", "functional", "server", "client", "browser"],
 	"author": "mariuszk",
 	"contributors": [],
-	"dependencies": {}
+	"dependencies": {},
+	"scripts": {
+		"start": "node main.js"
+	}
+
 }
