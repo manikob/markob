@@ -1,13 +1,14 @@
 var http = require("http");
-var isHeroku = process.env ? true : false;
 
 exports.create = function (port) {
 	http.createServer(function (request, response) {
 		response.writeHead(200, {"Content-Type": "text/plain"});
 
-		if (isHeroku) {
-			response.write("Environments:\n");
-			response.write(process.env.PORT);
+		if (process.env) {
+			response.write("Environment variables:\n");
+			Object.keys(process.env).forEach(function (key) {
+				response.write(key + ":" + process.env[key] + "\n");
+			});
 		}
 		response.end();
 	}).listen(port);

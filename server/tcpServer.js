@@ -1,5 +1,4 @@
 var http = require("http");
-var isHeroku = process.env ? true : false;
 
 exports.create = function(port) {
 	http.createServer(function(request, response) {
