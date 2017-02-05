@@ -1,17 +1,27 @@
-var http = require("http");
+var net = require('net');
 
 exports.create = function (port) {
-	http.createServer(function (request, response) {
-		response.writeHead(200, {"Content-Type": "text/plain"});
-
+	net.createServer(function (socket) {
 		if (process.env) {
-			response.write("Environment variables:\n");
+			socket.write("Environment variables:\n");
 			Object.keys(process.env).forEach(function (key) {
-				response.write(key + ":" + process.env[key] + "\n");
+				socket.write(key + ":" + process.env[key] + "\n");
 			});
 		}
-		response.end();
 	}).listen(port);
+	
+//	http.createServer(function (request, response) {
+//		response.writeHead(200, {"Content-Type": "text/plain"});
+
+
+//		if (process.env) {
+//			response.write("Environment variables:\n");
+//			Object.keys(process.env).forEach(function (key) {
+//				response.write(key + ":" + process.env[key] + "\n");
+//			});
+//		}
+//		response.end();
+//	}).listen(port);
 };
 
 
