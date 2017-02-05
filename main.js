@@ -1,19 +1,18 @@
 var http = require('http');
 var fs = require('fs');
 
-// Loading the index file . html displayed to the client
-
 var server = http.createServer(function (req, res) {
-	fs.readFile('./index.html', 'utf-8', function (error, content) {
-		res.writeHead(200, {"Content-Type": "text/html"});
-		res.end(content);
+	
+	res.writeHead(200, {"Content-Type": "text/html"});
+	res.write("Environment variables:<br>");
+	Object.keys(process.env).forEach(function (key) {
+		res.write(key + ":" + process.env[key] + "<br>");
 	});
+	res.end();
+	console.log('Http server is created');
 });
 
-
-// Loading socket.io
 var io = require('socket.io').listen(server);
-// When a client connects, we note it in the console
 io.sockets.on('connection', function (socket) {
 	console.log('A client is connected!');
 });
