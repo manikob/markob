@@ -1,20 +1,16 @@
-var http = require('http');
-var fs = require('fs');
+// process.argv[0] - node
+// process.argv[1] - app name
+// process.argv[2] - gt02 port
+// process.argv[3] - client/http port
 
-var server = http.createServer(function (req, res) {
+var logger = require('./tools/logger');
+logger.info('Starting: ' + __filename);
+
+if (process.argv.length < 4) {
+	console.log('Incorrect attributes:\n');
+	console.log('Example: node main.js [gt02Port] [client/httpPort]');
 	
-	res.writeHead(200, {"Content-Type": "text/html"});
-	res.write("Environment variables:<br>");
-	Object.keys(process.env).forEach(function (key) {
-		res.write(key + ":" + process.env[key] + "<br>");
-	});
-	res.end();
-	console.log('Http server is created');
-});
-
-var io = require('socket.io').listen(server);
-io.sockets.on('connection', function (socket) {
-	console.log('A client is connected!');
-});
-
-server.listen(process.env.PORT || 8080);
+} else {
+	require('./server/gt02TcpServer').create(process.argv[2]);
+	require('./server/clientTcpServer').create(process.argv[3]);
+}
