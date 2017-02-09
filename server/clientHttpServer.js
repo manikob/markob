@@ -6,6 +6,16 @@ var read = Promise.denodeify(require("fs").readFile);
 
 logger.info('Starting: ' + __filename);
 
+var _switchLog = function() {
+	var logLevels = [ 'error', 'info', 'debug' ];
+	var idx = logLevels.indexOf(logger.level);
+	if (idx == -1 || idx == 2) {
+		logger.level = logLevels[0];
+	} else {
+		logger.level = logLevels[idx+1];
+	}
+};
+
 var _traceContent = function (url) {
 	var pBody;
 	var pTitle;
@@ -30,10 +40,16 @@ var _traceContent = function (url) {
 var _webContent = function (url) {
 	switch (url) {
 		case constants.urlEndPoint.URL_INDEX:
-			return read(__dirname + "/../webpages/index.html");
+			return read(__dirname + "/../webpages/index.html")
+					.then(function (content) {
+						return content.toString().replace('{{logLevel}}', logger.level);
+					});
 		case constants.urlEndPoint.URL_LOGSDEBUG:
 		case constants.urlEndPoint.URL_LOGSERROR:
 			return _traceContent(url);
+		case constants.urlEndPoint.URL_SWITCHLOG:
+			_switchLog();
+			return _webContent(constants.urlEndPoint.URL_INDEX);
 		default:
 			return read(__dirname + "/../webpages/err.html");
 	}

@@ -10,7 +10,8 @@ var packetPrefix = {
 var urlEndPoint = {
 	URL_INDEX: "/index.html",
 	URL_LOGSDEBUG: "/logsDebug",
-	URL_LOGSERROR: "/logsError"
+	URL_LOGSERROR: "/logsError",
+	URL_SWITCHLOG: "/switchLog"
 };
 
 module.exports.packetPrefix = packetPrefix;

@@ -43,4 +43,6 @@ exports.create = function (port) {
 	}).listen(port);
 };
 
+exports.heartBeatResponse = _heartBeatResponse;
+
 
