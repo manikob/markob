@@ -12,7 +12,7 @@ var _heartBeatResponse = function () {
 	});
 };
 
-var _callBack = function(buf) {
+var _callBack = function (buf) {
 	if (buf.length > 0) {
 		switch (buf[0]) {
 			case constants.packetPrefix.CLIENT_HEARTBEAT :
@@ -21,22 +21,22 @@ var _callBack = function(buf) {
 				return require('../tools/traceReader').getTraces();
 		}
 	}
-	
+
 	return Promise.resolve(Buffer.from([]));
 };
 
 exports.create = function (port) {
 	net.createServer(function (socket) {
 		logger.info('Client connection established: ' + socket.remoteAddress + ":" + socket.remotePort);
-		
-		socket.on('data', function(buf) {
+
+		socket.on('data', function (buf) {
 			logger.info('Received data from client. Data size: ' + buf.length);
-			_callBack(buf).then( function(cBuff) { 
+			_callBack(buf).then(function (cBuff) {
 				socket.write(cBuff);
 			});
 		});
-		
-		socket.on('end', function() {
+
+		socket.on('end', function () {
 			logger.info('Connection closed');
 		});
 
