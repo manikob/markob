@@ -1,3 +1,5 @@
+/* global __filename, __dirname */
+
 var http = require('http');
 var constants = require('../tools/const');
 var logger = require('../tools/logger');
@@ -6,17 +8,17 @@ var read = Promise.denodeify(require("fs").readFile);
 
 logger.info('Starting: ' + __filename);
 
-var _switchLog = function() {
-	var logLevels = [ 'error', 'info', 'debug' ];
+var _switchLog = () => {
+	var logLevels = ['error', 'info', 'debug'];
 	var idx = logLevels.indexOf(logger.level);
 	if (idx == -1 || idx == 2) {
 		logger.level = logLevels[0];
 	} else {
-		logger.level = logLevels[idx+1];
+		logger.level = logLevels[idx + 1];
 	}
 };
 
-var _traceContent = function (url) {
+var _traceContent = (url) => {
 	var pBody;
 	var pTitle;
 	if (constants.urlEndPoint.URL_LOGSDEBUG === url) {
@@ -31,17 +33,17 @@ var _traceContent = function (url) {
 	}
 
 	return Promise.all([read(__dirname + "/../webpages/traceView.html"), pTitle, pBody])
-			.then(function (data) {
+			.then((data) => {
 				return data[0].toString().replace('{{title}}', data[1])
 						.replace('{{content}}', data[2]);
 			});
 };
 
-var _webContent = function (url) {
+var _webContent = (url) => {
 	switch (url) {
 		case constants.urlEndPoint.URL_INDEX:
 			return read(__dirname + "/../webpages/index.html")
-					.then(function (content) {
+					.then((content) => {
 						return content.toString().replace('{{logLevel}}', logger.level);
 					});
 		case constants.urlEndPoint.URL_LOGSDEBUG:
@@ -55,8 +57,8 @@ var _webContent = function (url) {
 	}
 };
 
-exports.create = function (port) {
-	http.createServer(function (req, response) {
+exports.create = (port) => {
+	http.createServer((req, response) => {
 		_webContent(req.url).then(function (html) {
 			response.writeHeader(200, {"Content-Type": "text/html"});
 			response.write(html);

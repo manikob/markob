@@ -1,3 +1,5 @@
+/* global __filename */
+
 // process.argv[0] - node
 // process.argv[1] - app name
 // process.argv[2] - gt02 tcp port

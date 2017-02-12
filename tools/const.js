@@ -1,5 +1,6 @@
+/* global __dirname */
 
-var packetPrefix = {
+const packetPrefix = {
 	GT_MSGDATA: 0x10,
 	GT_HEARTBEAT: 0x1A,
 	GT_RESPONSE: 0x1C,
@@ -7,7 +8,7 @@ var packetPrefix = {
 	CLIENT_CHECKTRACES: 0x1B
 };
 
-var urlEndPoint = {
+const urlEndPoint = {
 	URL_INDEX: "/index.html",
 	URL_LOGSDEBUG: "/logsDebug",
 	URL_LOGSERROR: "/logsError",
