@@ -1,4 +1,5 @@
 /* global __filename */
+'use strict';
 
 // process.argv[0] - node
 // process.argv[1] - app name

@@ -1,28 +1,18 @@
 /* global __filename, __dirname, Promise */
+'use strict';
 
 var net = require('net');
 var logger = require('../tools/logger');
-var constants = require('../tools/const');
-var fs = require("fs");
+var writeFile = require('promise').denodeify(require("fs").writeFile);
+var MsgDecoder = require('../tools/msgDecoder');
 
 logger.info('Starting: ' + __filename);
 
 
 var _byteFileLogger = (buf) => {
 	if (['info', 'verbose', 'debug', 'silly'].indexOf(logger.level) > -1) {
-		fs.writeFile(__dirname + '/../logs/dump/' + parseInt(Date.now().toString() / 1000) + ".trc", buf);
+		writeFile(__dirname + '/../logs/dump/' + parseInt(Date.now().toString() / 1000) + ".trc", buf).catch((exc) => logger.error(exc.stack));
 	}
-};
-
-var _callBack = (buf) => {
-	if (buf.length > 0) {
-		switch (buf[0]) {
-			case constants.packetPrefix.CLIENT_HEARTBEAT :
-				return require('./clientTcpServer').heartBeatResponse();
-		}
-	}
-
-	return Promise.resolve(Buffer.from([]));
 };
 
 exports.create = (port) => {
@@ -35,9 +25,9 @@ exports.create = (port) => {
 			logger.info('Received data from tracker. Data size: ' + buf.length);
 			_byteFileLogger(buf);
 
-			_callBack(buf).then((cBuff) => {
+			new MsgDecoder(buf).callBack().then((cBuff) => {
 				socket.write(cBuff);
-			});
+			}).catch((exc) => logger.error(exc));
 		});
 
 		socket.on('close', () => {

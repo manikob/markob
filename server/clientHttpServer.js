@@ -1,4 +1,5 @@
 /* global __filename, __dirname */
+'use strict';
 
 var http = require('http');
 var constants = require('../tools/const');
@@ -36,7 +37,7 @@ var _traceContent = (url) => {
 			.then((data) => {
 				return data[0].toString().replace('{{title}}', data[1])
 						.replace('{{content}}', data[2]);
-			});
+			}).catch((exc) => logger.error(exc.stack));
 };
 
 var _webContent = (url) => {
@@ -59,12 +60,12 @@ var _webContent = (url) => {
 
 exports.create = (port) => {
 	http.createServer((req, response) => {
-		_webContent(req.url).then(function (html) {
+		_webContent(req.url).then((html) => {
 			response.writeHeader(200, {"Content-Type": "text/html"});
 			response.write(html);
 			response.end();
 			response.end();
-		});
+		}).catch((exc) => logger.error(exc.stack));
 	}).listen(port);
 };
 
