@@ -11,15 +11,18 @@ module.exports = function () {
 	var _handshakeResp = (id) => {
 		return '(' + id + constants.packetPrefix.HANDSHAKE_RESP + 'HSO' + ')';
 	};
+	
+	var _loginResponse = (id) => {
+		return '(' + id + constants.packetPrefix.LOGIN_RESP + ')';
+	};
 
-	/*
-	 * Return collection of callback command
-	 */
 	this.callBack = (msgDecoder) => {
 		if (msgDecoder.valid()) {
 			switch (msgDecoder.operationType()) {
 				case constants.packetPrefix.HANDSHAKE:
 					return Promise.resolve(_handshakeResp(msgDecoder.operationID()));
+				case constants.packetPrefix.LOGIN:
+					return Promise.resolve(_loginResponse(msgDecoder.operationID()));
 			}
 		}
 

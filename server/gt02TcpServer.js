@@ -35,8 +35,12 @@ exports.create = (port) => {
 				ctxManager.getContext(socket).setId(msgDecoder.operationID());
 			}
 			cmdBuilder.callBack(msgDecoder)
-					.then((cBuff) => socket.write(cBuff))
-					.catch((exc) => logger.error(exc));
+					.then((cBuff) => {
+						if (cBuff.length > 0) {
+							socket.write(cBuff);
+							logger.info('Send data to tracker: ' + cBuff.toString());
+						}
+					}).catch((exc) => logger.error(exc));
 		});
 
 		socket.on('close', () => {

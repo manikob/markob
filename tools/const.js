@@ -5,7 +5,10 @@ const packetPrefix = {
 	HANDSHAKE: 'BP00',
 	HANDSHAKE_RESP: 'AP01',
 	
-	ONETIME_MSG: 'AP00'
+	ONETIME_MSG: 'AP00',
+	
+	LOGIN: 'BP05',
+	LOGIN_RESP: 'AP05'
 };
 
 const urlEndPoint = {
