@@ -1,11 +1,12 @@
-/* global __filename, __dirname */
+/* global __filename, __dirname, Promise */
 'use strict';
 
-var http = require('http');
-var constants = require('../tools/const');
-var logger = require('../tools/logger');
-var Promise = require('promise');
-var read = Promise.denodeify(require("fs").readFile);
+const http = require('http');
+const constants = require('../tools/const');
+const logger = require('../tools/logger');
+const readFile = require('promise').denodeify(require("fs").readFile);
+const ctxManager = require('../tools/const').ctxMgr;
+const CmdBuilder = require('../tools/commandBuilder');
 
 logger.info('Starting: ' + __filename);
 
@@ -33,7 +34,7 @@ var _traceContent = (url) => {
 		pTitle = Promise.resolve('Unknown file name');
 	}
 
-	return Promise.all([read(__dirname + "/../webpages/traceView.html"), pTitle, pBody])
+	return Promise.all([readFile(__dirname + "/../webpages/traceView.html"), pTitle, pBody])
 			.then((data) => {
 				return data[0].toString().replace('{{title}}', data[1])
 						.replace('{{content}}', data[2]);
@@ -43,7 +44,7 @@ var _traceContent = (url) => {
 var _webContent = (url) => {
 	switch (url) {
 		case constants.urlEndPoint.URL_INDEX:
-			return read(__dirname + "/../webpages/index.html")
+			return readFile(__dirname + "/../webpages/index.html")
 					.then((content) => {
 						return content.toString().replace('{{logLevel}}', logger.level);
 					});
@@ -53,8 +54,14 @@ var _webContent = (url) => {
 		case constants.urlEndPoint.URL_SWITCHLOG:
 			_switchLog();
 			return _webContent(constants.urlEndPoint.URL_INDEX);
+		case '/' + constants.packetPrefix.ONETIME_MSG:
+			new CmdBuilder().sendToAll(constants.packetPrefix.ONETIME_MSG);
+			return _webContent(constants.urlEndPoint.URL_INDEX);
+		case '/' + constants.packetPrefix.RESTART:
+			new CmdBuilder().sendToAll(constants.packetPrefix.RESTART_RESP);
+			return _webContent(constants.urlEndPoint.URL_INDEX);
 		default:
-			return read(__dirname + "/../webpages/err.html");
+			return readFile(__dirname + "/../webpages/err.html");
 	}
 };
 

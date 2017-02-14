@@ -1,16 +1,15 @@
 /* global __filename, __dirname, Promise */
 'use strict';
 
-var net = require('net');
-var logger = require('../tools/logger');
-var writeFile = require('promise').denodeify(require("fs").writeFile);
-var MsgDecoder = require('../tools/msgDecoder');
-var CmdBuilder = require('../tools/commandBuilder');
-var CtxManager = new require('../tools/socketContext');
+const net = require('net');
+const logger = require('../tools/logger');
+const writeFile = require('promise').denodeify(require("fs").writeFile);
+const MsgDecoder = require('../tools/msgDecoder');
+const CmdBuilder = require('../tools/commandBuilder');
+const ctxManager = require('../tools/const').ctxMgr;
 
 logger.info('Starting: ' + __filename);
 
-var ctxManager = new CtxManager();
 var cmdBuilder = new CmdBuilder();
 
 var _byteFileLogger = (buf) => {
@@ -24,6 +23,7 @@ exports.create = (port) => {
 	net.createServer((socket) => {
 		logger.info('Tracker connection established: ' + socket.remoteAddress + ":" + socket.remotePort);
 		ctxManager.add(socket);
+		//socket.setKeepAlive(true);
 
 		socket.on('data', (buf) => {
 
@@ -32,15 +32,13 @@ exports.create = (port) => {
 
 			var msgDecoder = new MsgDecoder(buf);
 			if (msgDecoder.valid()) {
-				ctxManager.getContext(socket).setId(msgDecoder.operationID());
+				var ctx = ctxManager.getContext(socket);
+				ctx.setId(msgDecoder.operationID());
+
+				cmdBuilder.callBackCode(msgDecoder)
+						.then((code) => cmdBuilder.sendTo(ctx, code))
+						.catch((exc) => logger.error(exc));
 			}
-			cmdBuilder.callBack(msgDecoder)
-					.then((cBuff) => {
-						if (cBuff.length > 0) {
-							socket.write(cBuff);
-							logger.info('Send data to tracker: ' + cBuff.toString());
-						}
-					}).catch((exc) => logger.error(exc));
 		});
 
 		socket.on('close', () => {
