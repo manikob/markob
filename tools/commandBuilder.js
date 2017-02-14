@@ -39,7 +39,9 @@ module.exports = function () {
 
 	this.sendToAll = (code) => {
 		for (const ctx of ctxManager.ctxColl.values()) {
-			this.sendTo(ctx, code);
+			if (!ctx.isDirty()) {
+				this.sendTo(ctx, code);
+			}
 		}
 	};
 };

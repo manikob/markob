@@ -29,6 +29,7 @@ exports.create = (port) => {
 
 	net.createServer((socket) => {
 		logger.info('Tracker connection established: ' + socket.remoteAddress + ":" + socket.remotePort);
+		ctxManager.cleanUp();
 		ctxManager.add(socket);
 
 		socket.on('data', (buffer) => {
@@ -38,12 +39,10 @@ exports.create = (port) => {
 			
 			_messageSplitter(buffer).forEach((buf) => {
 				var msgDecoder = new MsgDecoder(buf);
-				
+				var ctx = ctxManager.getContext(socket);
 				if (msgDecoder.operationType() === constants.packetPrefix.RESTART_RESP) {
-					socket.end();
-					socket.destroy();
-				} else if (msgDecoder.valid()) {
-					var ctx = ctxManager.getContext(socket);
+					ctx.setDirty();
+				} else if (msgDecoder.valid() && !ctx.isDirty()) {
 					ctx.setId(msgDecoder.operationID());
 
 					cmdBuilder.callBackCode(msgDecoder)
