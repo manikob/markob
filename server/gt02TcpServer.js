@@ -40,7 +40,6 @@ exports.create = (port) => {
 				var msgDecoder = new MsgDecoder(buf);
 				
 				if (msgDecoder.operationType() === constants.packetPrefix.RESTART_RESP) {
-					ctxManager.remove(socket);
 					socket.end();
 					socket.destroy();
 				} else if (msgDecoder.valid()) {
