@@ -24,7 +24,8 @@ const urlEndPoint = {
 };
 
 const patterns = {
-	BASE_PATTERN: '^\\(\\d{12}B[A-Z]{1}\\d{2}.*\\)$'
+	SINGLE_MSG: '\\d{12}B[A-Z]{1}\\d{2}.*',
+	SPLIT_MSG: /\)\(|\(|\)/
 };
 
 module.exports.ctxMgr = new CtxManager();

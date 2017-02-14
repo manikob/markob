@@ -27,13 +27,13 @@ module.exports = function () {
 					break;
 				case constants.packetPrefix.LOGIN_RESP:
 				case constants.packetPrefix.ONETIME_MSG:
-				case constants.packetPrefix.RESTART_RESP:
+				case constants.packetPrefix.RESTART:
 					rawMsg = '(' + ctx.id + code + ')';
 					break;
 			}
 
 			ctx.socket.write(rawMsg);
-			logger.info('Send data to tracker: ' + rawMsg.toString());
+			logger.info('Send data to tracker(' + ctx.ip() + '): ' + rawMsg.toString());
 		}
 	};
 

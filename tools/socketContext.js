@@ -31,4 +31,8 @@ module.exports = function () {
 	this.getContext = (socket) => {
 		return this.ctxColl.get(socket);
 	};
+
+	this.clear = () => {
+		this.ctxColl.clear();
+	};
 };

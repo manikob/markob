@@ -58,7 +58,7 @@ var _webContent = (url) => {
 			new CmdBuilder().sendToAll(constants.packetPrefix.ONETIME_MSG);
 			return _webContent(constants.urlEndPoint.URL_INDEX);
 		case '/' + constants.packetPrefix.RESTART:
-			new CmdBuilder().sendToAll(constants.packetPrefix.RESTART_RESP);
+			new CmdBuilder().sendToAll(constants.packetPrefix.RESTART);
 			return _webContent(constants.urlEndPoint.URL_INDEX);
 		default:
 			return readFile(__dirname + "/../webpages/err.html");

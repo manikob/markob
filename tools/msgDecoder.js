@@ -8,13 +8,13 @@ module.exports = function (buff) {
 	this.sBuff = buff.length > 0 ? buff.toString() : '';
 
 	this.valid = () => {
-		return new RegExp(constants.patterns.BASE_PATTERN).test(this.sBuff);
+		return new RegExp(constants.patterns.SINGLE_MSG).test(this.sBuff);
 	};
 
 	this.operationID = () => {
-		return this.sBuff.substring(1, 13);
+		return this.sBuff.substring(0, 12);
 	};
 	this.operationType = () => {
-		return this.sBuff.substring(13, 17);
+		return this.sBuff.substring(12, 16);
 	};
 };

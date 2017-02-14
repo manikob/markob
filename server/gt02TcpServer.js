@@ -6,7 +6,8 @@ const logger = require('../tools/logger');
 const writeFile = require('promise').denodeify(require("fs").writeFile);
 const MsgDecoder = require('../tools/msgDecoder');
 const CmdBuilder = require('../tools/commandBuilder');
-const ctxManager = require('../tools/const').ctxMgr;
+const constants = require('../tools/const');
+const ctxManager = constants.ctxMgr;
 
 logger.info('Starting: ' + __filename);
 
@@ -18,27 +19,39 @@ var _byteFileLogger = (buf) => {
 	}
 };
 
+var _messageSplitter = (buf) => {
+	return buf 
+			? buf.toString().split(constants.patterns.SPLIT_MSG).filter((x) => x && x.length > 0)
+			: [];
+};
+
 exports.create = (port) => {
 
 	net.createServer((socket) => {
 		logger.info('Tracker connection established: ' + socket.remoteAddress + ":" + socket.remotePort);
 		ctxManager.add(socket);
-		//socket.setKeepAlive(true);
 
-		socket.on('data', (buf) => {
+		socket.on('data', (buffer) => {
 
-			logger.info('Received data from tracker. Data size: ' + buf.length);
-			_byteFileLogger(buf);
+			logger.info('Received data from tracker. Data size: ' + buffer.length);
+			_byteFileLogger(buffer);
+			
+			_messageSplitter(buffer).forEach((buf) => {
+				var msgDecoder = new MsgDecoder(buf);
+				
+				if (msgDecoder.operationType() === constants.packetPrefix.RESTART_RESP) {
+					ctxManager.remove(socket);
+					socket.end();
+					socket.destroy();
+				} else if (msgDecoder.valid()) {
+					var ctx = ctxManager.getContext(socket);
+					ctx.setId(msgDecoder.operationID());
 
-			var msgDecoder = new MsgDecoder(buf);
-			if (msgDecoder.valid()) {
-				var ctx = ctxManager.getContext(socket);
-				ctx.setId(msgDecoder.operationID());
-
-				cmdBuilder.callBackCode(msgDecoder)
-						.then((code) => cmdBuilder.sendTo(ctx, code))
-						.catch((exc) => logger.error(exc));
-			}
+					cmdBuilder.callBackCode(msgDecoder)
+							.then((code) => cmdBuilder.sendTo(ctx, code))
+							.catch((exc) => logger.error(exc));
+				}
+			});
 		});
 
 		socket.on('close', () => {
@@ -50,5 +63,12 @@ exports.create = (port) => {
 			logger.error('Tracker connection error: ' + err.stack);
 		});
 
-	}).listen(port);
+	}).listen(port)
+	  .on('error', (err) => {
+		  logger.error('Tracker connection error: ' + err.stack);
+		  ctxManager.clear();
+	  }).on('close', () => {
+		  logger.error('Close connection to tracker');
+		  ctxManager.clear();
+	  });
 };
