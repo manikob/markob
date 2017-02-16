@@ -5,7 +5,6 @@ const http = require('http');
 const constants = require('../tools/const');
 const logger = require('../tools/logger');
 const readFile = require('promise').denodeify(require("fs").readFile);
-const ctxManager = require('../tools/const').ctxMgr;
 const CmdBuilder = require('../tools/commandBuilder');
 
 logger.info('Starting: ' + __filename);
@@ -42,6 +41,12 @@ var _traceContent = (url) => {
 };
 
 var _webContent = (url) => {
+	// tests
+	if (url.startsWith('/CUSTOM/')) {
+		new CmdBuilder().sendCustom(url.substring(8));
+		return _webContent(constants.urlEndPoint.URL_INDEX);
+	}
+	
 	switch (url) {
 		case constants.urlEndPoint.URL_INDEX:
 			return readFile(__dirname + "/../webpages/index.html")
@@ -70,7 +75,6 @@ exports.create = (port) => {
 		_webContent(req.url).then((html) => {
 			response.writeHeader(200, {"Content-Type": "text/html"});
 			response.write(html);
-			response.end();
 			response.end();
 		}).catch((exc) => logger.error(exc.stack));
 	}).listen(port);

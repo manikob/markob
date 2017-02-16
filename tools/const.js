@@ -13,7 +13,10 @@ const packetPrefix = {
 	LOGIN_RESP: 'AP05',
 	
 	RESTART: 'AT00',
-	RESTART_RESP: 'BT00'
+	RESTART_RESP: 'BT00',
+	
+	ISOCHRONIC_CONF: 'AR00',
+	ISOCHRONIC_RESP: 'BS08'
 };
 
 const urlEndPoint = {
@@ -28,10 +31,14 @@ const patterns = {
 	SPLIT_MSG: /\)\(|\(|\)/
 };
 
+const debugFileFolder = __dirname + '/../logs';
+
 module.exports.ctxMgr = new CtxManager();
 module.exports.contexts = [];
 module.exports.packetPrefix = packetPrefix;
 module.exports.urlEndPoint = urlEndPoint;
 module.exports.patterns = patterns;
-module.exports.debugFilePath = __dirname + '/../logs/debug.log';
-module.exports.excFilePath = __dirname + '/../logs/exceptions.log';
+module.exports.debugFileFolder = debugFileFolder;
+module.exports.dumpFileFolder = debugFileFolder + '/dump';
+module.exports.debugFilePath = debugFileFolder + '/debug.log';
+module.exports.excFilePath = debugFileFolder + '/exceptions.log';
