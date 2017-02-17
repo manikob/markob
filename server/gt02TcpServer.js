@@ -7,6 +7,7 @@ const MsgDecoder = require('../tools/msgDecoder');
 const CmdBuilder = require('../tools/commandBuilder');
 const constants = require('../tools/const');
 const ctxManager = constants.ctxMgr;
+const conn = require('../db/db');
 
 logger.info('Starting: ' + __filename);
 
@@ -31,15 +32,23 @@ exports.create = (port) => {
 
 			_messageSplitter(buffer).forEach((buf) => {
 				var msgDecoder = new MsgDecoder(buf);
-				var ctx = ctxManager.getContext(socket);
-				if (msgDecoder.operationType() === constants.packetPrefix.RESTART_RESP) {
-					ctx.setDirty();
-				} else if (msgDecoder.valid() && !ctx.isDirty()) {
-					ctx.setId(msgDecoder.operationID());
-
-					cmdBuilder.callBackCode(msgDecoder)
-							.then((code) => cmdBuilder.sendTo(ctx, code))
-							.catch((exc) => logger.error(exc));
+				if (msgDecoder.valid()) {
+					var ctx = ctxManager.getContext(socket);
+					ctx.setImei(msgDecoder.imei());
+					
+					if (!ctx.isDirty()) {
+						ctx.setId(msgDecoder.operationID());
+						conn.storeIncomingMsg(ctx, buf);
+						
+						if (msgDecoder.operationType() === constants.packetPrefix.RESTART_RESP) {
+							ctx.setDirty();
+						} else {
+							
+							cmdBuilder.callBackCode(msgDecoder)
+									.then((code) => cmdBuilder.sendTo(ctx, code))
+									.catch((exc) => logger.error(exc));
+						}
+					}
 				}
 			});
 		});

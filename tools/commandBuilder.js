@@ -4,6 +4,7 @@ const constants = require('./const');
 const logger = require('./logger');
 const ctxManager = require('../tools/const').ctxMgr;
 const S = require('string');
+const conn = require('../db/db');
 
 module.exports = function () {
 
@@ -34,6 +35,7 @@ module.exports = function () {
 			}
 
 			ctx.socket.write(rawMsg);
+			conn.storeOutgoingMsg(ctx, rawMsg);
 			logger.info('Send data to tracker(' + ctx.ip() + '): ' + rawMsg.toString());
 		}
 	};
@@ -50,6 +52,7 @@ module.exports = function () {
 		for (const ctx of ctxManager.ctxColl.values()) {
 			if (!ctx.isDirty()) {
 				ctx.socket.write(rawMsg);
+				conn.storeOutgoingMsg(ctx, rawMsg);
 				logger.info('Send data to tracker(' + ctx.ip() + '): ' + rawMsg.toString());
 			}
 		}

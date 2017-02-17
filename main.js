@@ -10,8 +10,8 @@
 const logger = require('./tools/logger');
 
 logger.info('Starting: ' + __filename);
+require('./db/db').initDB();
 
-require('./db/init').initDB();
 if (process.argv.length < 5) {
 	console.log('Incorrect attributes:\n');
 	console.log('Example: node main.js [gt02Port] [clientTcpPort] [clientHttpPort]');

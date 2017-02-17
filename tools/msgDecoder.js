@@ -17,4 +17,12 @@ module.exports = function (buff) {
 	this.operationType = () => {
 		return this.sBuff.substring(12, 16);
 	};
+
+	var _hasImei = () => {
+		return [constants.packetPrefix.HANDSHAKE, constants.packetPrefix.LOGIN].indexOf(this.operationType()) != -1;
+	};
+
+	this.imei = () => {
+		return _hasImei() ? this.sBuff.substring(16, 16 + 15) : undefined;
+	};
 };

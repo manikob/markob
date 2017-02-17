@@ -4,6 +4,7 @@
 var _context = function (sck) {
 	this.socket = sck;
 	this.id;
+	this.imei;
 	this.dirty = false;
 
 	this.ip = () => {
@@ -25,6 +26,15 @@ var _context = function (sck) {
 	
 	this.isDirty = () => {
 		return this.dirty;
+	};
+	
+	this.setImei = (imei) => {
+		if (imei)
+			this.imei = imei;
+	};
+	
+	this.getImei = () => {
+		return this.imei;
 	};
 };
 

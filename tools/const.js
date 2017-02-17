@@ -21,6 +21,7 @@ const packetPrefix = {
 
 const urlEndPoint = {
 	URL_INDEX: '/index.html',
+	URL_UNAUTH: '/unaccess.html',
 	URL_LOGSDEBUG: '/logsDebug',
 	URL_LOGSERROR: '/logsError',
 	URL_SWITCHLOG: '/switchLog'
